@@ -1,41 +1,51 @@
-const contactService = require("../models/contacts");
-
-const { HttpError } = require("../helpers/HttpError");
+const HttpError = require("../helpers/HttpError");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
-
+const {Contact} = require('../models/contacts')
 
 const listContacts = async (req, res) => {
-  const result = await contactService.listContacts();
+  const result = await Contact.find({}, "-createdAt -updatedAt");
   res.json(result);
 };
 
 const getContactById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await contactService.getContactById(contactId);
+  const result = await Contact.findById(contactId)
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, `Contact with ${contactId} not found`);
   }
   res.json(result);
 };
 
 const addContact = async (req, res) => {
-  const result = await contactService.addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
 const updateContactById = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactService.updateContactById(contactId, req.body);
-  res.json({ message: "Contact changed", result });
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true});
+  if (!result) {
+    throw HttpError(404, `Contact with ${contactId} not found`);
+  }
+  res.json(result);
+};
+
+const updateFavoriteById = async (req, res, next) => {
+  const { contactId } = req.params;
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {new: true});
+  if (!result) {
+    throw HttpError(404, `Contact with ${contactId} not found`);
+  }
+  res.json(result);
 };
 
 const removeContact = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactService.removeContact(contactId);
+  const result = await Contact.findByIdAndDelete(contactId);
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, `Contact with ${contactId} not found`);
   }
-  res.json({ message: "contact deleted" });
+  res.json({ message: "Contact deleted" });
 };
 
 module.exports = {
@@ -44,4 +54,5 @@ module.exports = {
   addContact: ctrlWrapper(addContact),
   updateContactById: ctrlWrapper(updateContactById),
   removeContact: ctrlWrapper(removeContact),
+  updateFavoriteById: ctrlWrapper(updateFavoriteById),
 };
