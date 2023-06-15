@@ -5,13 +5,9 @@ const { schemas } = require("../../models/user");
 
 const { validateBody, authenticate } = require("../../middlewares/index");
 
-router.post(
-  "/register",
-  validateBody(schemas.userRegisterSchema),
-  ctrl.register
-);
+router.post("/register", validateBody(schemas.checkUserSchema), ctrl.register);
 
-router.post("/login", validateBody(schemas.userLoginSchema), ctrl.login);
+router.post("/login", validateBody(schemas.checkUserSchema), ctrl.login);
 
 router.get("/current", authenticate, ctrl.getCurrent);
 

@@ -17,13 +17,14 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  console.log(hashPassword);
+
   const newUser = await User.create({ ...req.body, password: hashPassword });
 
   res.status(201).json({
-    name: newUser.name,
-    email: newUser.email,
-    subscription: newUser.subscription,
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
   });
 };
 
@@ -48,12 +49,11 @@ const login = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
 
   res.json({
+    token: token,
     user: {
-      name: user.name,
       email: user.email,
       subscription: user.subscription,
     },
-    token: user.token,
   });
 };
 
@@ -62,17 +62,14 @@ const logout = async (req, res) => {
 
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json({
-    message: "Logout success",
-  });
+  res.status(204).json();
 };
 
 const getCurrent = async (req, res) => {
-  const { email, name, subscription } = req.user;
+  const { email, subscription } = req.user;
 
   res.json({
     email,
-    name,
     subscription,
   });
 };
