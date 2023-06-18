@@ -11,6 +11,10 @@ const {
 
 router.post("/register", validateBody(schemas.checkUserSchema), ctrl.register);
 
+router.get("/verify/:verificationCode", ctrl.verify);
+
+router.post("/verify", validateBody(schemas.userEmailSchema), ctrl.resendVerifyEmail)
+
 router.post("/login", validateBody(schemas.checkUserSchema), ctrl.login);
 
 router.get("/current", authenticate, ctrl.getCurrent);
